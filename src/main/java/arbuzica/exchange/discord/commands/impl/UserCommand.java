@@ -79,6 +79,21 @@ public class UserCommand extends Command {
         userPanel.accept(handler);
     };
 
+    private final Consumer<ButtonHandler> recoveryAccountButton = handler -> {
+        ButtonInteractionEvent event = handler.getEvent();
+
+        TextInput textInput = TextInput.create("user_recovery_acc_input", "Code", TextInputStyle.SHORT) //
+                .setPlaceholder("XXXXX-XXXXX-XXXXX-XXXXX") //
+                .setRequiredRange(23, 23) //
+                .build();
+
+        Modal modal = ValueModal.create("user_recovery_acc_modal", "Recovery") //
+                .addActionRow(textInput) //
+                .build();
+
+        event.replyModal(modal).queue();
+    };
+
     private final Consumer<ButtonHandler> recoveryButton = handler -> {
         Callback callback = Callback.builder(handler);
         Account account = HandlerUtility.getAccount(handler);
@@ -98,21 +113,6 @@ public class UserCommand extends Command {
         );
 
         callback.queue();
-    };
-
-    private final Consumer<ButtonHandler> recoveryAccountButton = handler -> {
-        ButtonInteractionEvent event = handler.getEvent();
-
-        TextInput textInput = TextInput.create("user_recovery_acc_input", "Code", TextInputStyle.SHORT) //
-                .setPlaceholder("XXXXX-XXXXX-XXXXX-XXXXX") //
-                .setRequiredRange(23, 23) //
-                .build();
-
-        Modal modal = ValueModal.create("user_recovery_acc_modal", "Recovery") //
-                .addActionRow(textInput) //
-                .build();
-
-        event.replyModal(modal).queue();
     };
 
     private final Consumer<ButtonHandler> helpButton = handler -> {
