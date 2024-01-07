@@ -44,6 +44,10 @@ public class AdvancedButton {
         return builder().style(ButtonStyle.LINK);
     }
 
+    public static AdvancedButton back() {
+        return secondary().label("Back");
+    }
+
     //setters
     public AdvancedButton style(ButtonStyle style) {
         this.style = style;

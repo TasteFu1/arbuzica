@@ -10,6 +10,7 @@ import java.awt.Color;
 import java.util.function.Consumer;
 
 import arbuzica.exchange.Instance;
+import arbuzica.exchange.database.repositories.AccountRepository;
 import arbuzica.exchange.discord.handlers.impl.ButtonHandler;
 import arbuzica.exchange.discord.handlers.impl.ModalHandler;
 import arbuzica.exchange.discord.handlers.impl.SelectMenuHandler;
@@ -21,9 +22,10 @@ public abstract class Command {
     protected final Instance instance = Instance.get();
 
     /*** jda instance ***/
-    public final JDA jda = Instance.get().getJda();
+    protected final JDA jda = instance.getJda();
 
     /*** repositories ***/
+    protected final AccountRepository accountRepository = instance.getAccountRepository();
 
     /*** colors ***/
     protected final Color INFO_COLOR = new Color(0x80ff);

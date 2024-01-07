@@ -1,10 +1,11 @@
 package arbuzica.exchange.discord.commands;
 
-import net.dv8tion.jda.api.JDA;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import arbuzica.exchange.Instance;
+import arbuzica.exchange.discord.commands.impl.DevCommand;
+import arbuzica.exchange.discord.commands.impl.UserCommand;
 import lombok.Getter;
 
 @Getter
@@ -12,15 +13,16 @@ public class CommandHandler {
     private final List<Command> commandList = new ArrayList<>();
 
     private CommandHandler() {
-
+        commandList.add(new UserCommand());
+        commandList.add(new DevCommand());
     }
 
-    public static CommandHandler builder() {
+    public static CommandHandler init() {
         return new CommandHandler();
     }
 
-    public CommandHandler build(JDA jda) {
-        commandList.forEach(command -> jda.upsertCommand(command.getData()).queue());
+    public CommandHandler upsert() {
+        commandList.forEach(command -> Instance.get().getJda().upsertCommand(command.getData()).queue());
         return this;
     }
 

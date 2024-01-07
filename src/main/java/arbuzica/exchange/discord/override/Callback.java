@@ -11,21 +11,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import arbuzica.exchange.utilities.discord.EventUtils;
+import arbuzica.exchange.discord.handlers.IHandler;
+import arbuzica.exchange.utilities.discord.HandlerUtility;
 
 public class Callback {
     private final List<ItemComponent[]> actionRows = new ArrayList<>();
     private final List<MessageEmbed> embeds = new ArrayList<>();
-    private final GenericEvent event;
+    private final IHandler handler;
 
-    private Callback(GenericEvent event) {
-        this.event = event;
+    private Callback(IHandler handler) {
+        this.handler = handler;
     }
 
-    public static Callback builder(GenericEvent event) {
-        return new Callback(event);
+    public static Callback builder(IHandler handler) {
+        return new Callback(handler);
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public Callback addEmbeds(MessageEmbed... embeds) {
         this.embeds.addAll(Arrays.asList(embeds));
         return this;
@@ -38,8 +40,8 @@ public class Callback {
     }
 
     public void queue() {
-        if (EventUtils.isAcknowledged(event)) {
-            WebhookMessageCreateAction<Message> messageCreateAction = EventUtils.getHook(event).sendMessageEmbeds(embeds);
+        if (HandlerUtility.isAcknowledged(handler)) {
+            WebhookMessageCreateAction<Message> messageCreateAction = HandlerUtility.getHook(handler).sendMessageEmbeds(embeds);
 
             for (ItemComponent[] actionRow : this.actionRows) {
                 messageCreateAction.addActionRow(actionRow);
@@ -47,7 +49,7 @@ public class Callback {
 
             messageCreateAction.queue();
         } else {
-            ReplyCallbackAction callbackAction = EventUtils.getCallback(event).addEmbeds(embeds);
+            ReplyCallbackAction callbackAction = HandlerUtility.getCallback(handler).addEmbeds(embeds);
 
             for (ItemComponent[] actionRow : this.actionRows) {
                 callbackAction.addActionRow(actionRow);
@@ -58,7 +60,7 @@ public class Callback {
     }
 
     public void complete() {
-        WebhookMessageCreateAction<Message> messageCreateAction = EventUtils.getHook(event).sendMessageEmbeds(embeds);
+        WebhookMessageCreateAction<Message> messageCreateAction = HandlerUtility.getHook(handler).sendMessageEmbeds(embeds);
 
         for (ItemComponent[] actionRow : this.actionRows) {
             messageCreateAction.addActionRow(actionRow);
