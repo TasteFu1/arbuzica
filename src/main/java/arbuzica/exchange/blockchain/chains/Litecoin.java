@@ -136,6 +136,33 @@ public class Litecoin implements IBlockChain {
     }
 
     @SneakyThrows
+    public String getTransaction(String txID) {
+        return JsonParser.parseString(Request.Post(endpoint())
+                .addHeader("Content-Type", "text/plain")
+                .body(
+                        new StringEntity(
+                                String.format(
+                                        """
+                                                {
+                                                  "jsonrpc": "1.0",
+                                                  "id": "curltest",
+                                                  "method": "gettransaction",
+                                                  "params": [
+                                                    %s
+                                                  ]
+                                                }
+                                                """,
+                                        txID
+                                ),
+                                ContentType.APPLICATION_JSON
+                        )
+                )
+                .execute()
+                .returnContent().asString()
+        ).toString();
+    }
+
+    @SneakyThrows
     public String listUnspent() {
         return JsonParser.parseString(Request.Post(endpoint())
                 .addHeader("Content-Type", "text/plain")

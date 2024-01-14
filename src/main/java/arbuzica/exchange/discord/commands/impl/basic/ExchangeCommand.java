@@ -52,10 +52,10 @@ public class ExchangeCommand extends Command {
         double rate = litecoin.getRateToUSD();
         double satoshiPerByte = litecoin.getSatoshiPerByte();
 
-        double fee = 144 * satoshiPerByte * 0.00000001;
-        double amount = (1.0 / rate) * (credits - fee * rate - credits * 0.1);
+        double dynamicFeePercent = 10;
 
-        amount = 0.001;
+        double fee = 144 * satoshiPerByte * 0.00000001;
+        double amount = (1.0 / rate) * (credits - fee * rate - credits * (dynamicFeePercent / 100));
 
         String send = litecoin.send(address, amount, satoshiPerByte);
         String txId = JsonParser.parseString(send).getAsJsonObject().get("result").getAsJsonObject().get("txid").getAsString();
@@ -74,6 +74,7 @@ public class ExchangeCommand extends Command {
                 .setTitle("Transaction Sent") //
                 .addField("Date", StringUtility.timestamp("MM/dd/yyyy h:mm a", transaction.getDate()), true) //
                 .addField("Amount", String.format("%s | %.2f$", transaction.getAmount(), transaction.getAmount() * transaction.getRate()), true) //
+                .addField("Rate", String.format("1 LTC | %.2f", transaction.getRate()), true)
                 .addBlankField(true) //
                 .addField("To", transaction.getAddress(), false) //
                 .addField("Transaction ID", String.format("[%s](https://blockchair.com/litecoin/transaction/%s)", transaction.getTransactionId(), transaction.getTransactionId()), false) //
