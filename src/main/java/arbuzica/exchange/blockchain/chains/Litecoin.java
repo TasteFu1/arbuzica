@@ -5,6 +5,8 @@ import arbuzica.exchange.blockchain.IBlockChain;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 
 import org.apache.http.client.fluent.Request;
@@ -12,6 +14,13 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 
 public class Litecoin implements IBlockChain {
+    @Setter
+    @Getter
+    private Double satoshiPerByte;
+
+    @Setter
+    @Getter
+    private Double rateToUSD;
 
     @SneakyThrows
     @Override
@@ -77,18 +86,18 @@ public class Litecoin implements IBlockChain {
                         new StringEntity(
                                 String.format(
                                         """
-                                        {
-                                          "jsonrpc": "1.0",
-                                          "id": "curltest",
-                                          "method": "send",
-                                          "params": [
-                                            [{"%s": %s}],
-                                            null,
-                                            "unset",
-                                            %s
-                                          ]
-                                        }
-                                        """,
+                                                {
+                                                  "jsonrpc": "1.0",
+                                                  "id": "curltest",
+                                                  "method": "send",
+                                                  "params": [
+                                                    [{"%s": %s}],
+                                                    null,
+                                                    "unset",
+                                                    %s
+                                                  ]
+                                                }
+                                                """,
                                         address, amount, txFeeSatoshiPerVbyte
                                 ),
                                 ContentType.APPLICATION_JSON
@@ -107,17 +116,41 @@ public class Litecoin implements IBlockChain {
                         new StringEntity(
                                 String.format(
                                         """
+                                                {
+                                                  "jsonrpc": "1.0",
+                                                  "id": "curltest",
+                                                  "method": "estimatesmartfee",
+                                                  "params": [
+                                                    %s
+                                                  ]
+                                                }
+                                                """,
+                                        confTargetBlocks
+                                ),
+                                ContentType.APPLICATION_JSON
+                        )
+                )
+                .execute()
+                .returnContent().asString()
+        ).toString();
+    }
+
+    @SneakyThrows
+    public String listUnspent() {
+        return JsonParser.parseString(Request.Post(endpoint())
+                .addHeader("Content-Type", "text/plain")
+                .body(
+                        new StringEntity(
+                                """
                                         {
                                           "jsonrpc": "1.0",
                                           "id": "curltest",
-                                          "method": "estimatesmartfee",
+                                          "method": "listunspent",
                                           "params": [
-                                            %s
+                                               0
                                           ]
                                         }
                                         """,
-                                        confTargetBlocks
-                                ),
                                 ContentType.APPLICATION_JSON
                         )
                 )

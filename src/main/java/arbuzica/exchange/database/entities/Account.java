@@ -19,13 +19,15 @@ public class Account {
     private String id;
 
     private String discordId;
-    private Integer balance;
+    private Double credits;
     private String recoveryCode;
+    private String captcha;
 
     @Builder
     private Account(String discordId) {
         this.discordId = discordId;
-        this.balance = 0;
+        this.credits = 0.0;
         this.recoveryCode = StringUtility.randomCode(4);
+        this.captcha = "";
     }
 }

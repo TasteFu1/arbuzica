@@ -48,6 +48,10 @@ public class AdvancedButton {
         return secondary().label("Back");
     }
 
+    public static AdvancedButton download() {
+        return primary().label("Download");
+    }
+
     //setters
     public AdvancedButton style(ButtonStyle style) {
         this.style = style;

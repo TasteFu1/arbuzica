@@ -19,7 +19,7 @@ public class SlashCommandHandler implements IHandler {
             return;
         }
 
-        Command command = Instance.get().getCommandHandler().getCommandByName(eventIn.getName());
+        Command command = Instance.get().getCommandHandler().getCommand(eventIn.getName());
 
         if (command == null) {
             return;

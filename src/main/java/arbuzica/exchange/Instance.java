@@ -6,11 +6,19 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import arbuzica.exchange.database.repositories.AccountRepository;
+import arbuzica.exchange.database.repositories.SerialRepository;
+import arbuzica.exchange.database.repositories.TransactionRepository;
 import arbuzica.exchange.discord.commands.CommandHandler;
 import arbuzica.exchange.discord.handlers.EventHandler;
+import arbuzica.exchange.utilities.LitecoinUtility;
+import arbuzica.exchange.utilities.task.TaskManager;
+import arbuzica.exchange.utilities.task.impl.RequestRateTask;
+import arbuzica.exchange.utilities.task.impl.RequestSatoshiTask;
 import lombok.Getter;
 
 @Getter
@@ -33,22 +41,30 @@ public class Instance {
 
     /*** repositories ***/
     private final AccountRepository accountRepository;
+    private final SerialRepository serialRepository;
+    private final TransactionRepository transactionRepository;
 
     /*** handlers ***/
     private final CommandHandler commandHandler;
 
+    /*** task manager ***/
+    private final TaskManager taskManager;
+
     /*** constructor ***/
-    private Instance(ConfigurableApplicationContext context) throws InterruptedException {
+    public Instance(ConfigurableApplicationContext context) throws InterruptedException {
         INSTANCE = this;
 
         this.accountRepository = context.getBean(AccountRepository.class);
+        this.serialRepository = context.getBean(SerialRepository.class);
+        this.transactionRepository = context.getBean(TransactionRepository.class);
 
         this.jda = JDABuilder.createDefault(BOT_TOKEN).enableIntents(BOT_INTENTS).addEventListeners(new EventHandler()).build().awaitReady();
-        this.commandHandler = CommandHandler.init().upsert();
-    }
+        this.commandHandler = new CommandHandler(this.jda);
 
-    public static void start(ConfigurableApplicationContext context) throws InterruptedException {
-        new Instance(context);
+        this.taskManager = new TaskManager() //
+                .newTask(new RequestSatoshiTask(TimeUnit.MINUTES.toMillis(5))) //
+                .newTask(new RequestRateTask(TimeUnit.MINUTES.toMillis(5))) //
+                .tick();
     }
 
     public static Instance get() {

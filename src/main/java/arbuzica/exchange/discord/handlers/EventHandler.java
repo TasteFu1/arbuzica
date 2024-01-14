@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import arbuzica.exchange.discord.handlers.impl.ButtonHandler;
+import arbuzica.exchange.discord.handlers.impl.MessageHandler;
 import arbuzica.exchange.discord.handlers.impl.ModalHandler;
 import arbuzica.exchange.discord.handlers.impl.SelectMenuHandler;
 import arbuzica.exchange.discord.handlers.impl.SlashCommandHandler;
@@ -23,6 +24,7 @@ public class EventHandler implements EventListener {
         handlers.add(new ButtonHandler());
         handlers.add(new ModalHandler());
         handlers.add(new SelectMenuHandler());
+        handlers.add(new MessageHandler());
     }
 
     @Override

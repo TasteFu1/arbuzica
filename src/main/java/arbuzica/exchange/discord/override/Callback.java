@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageCreateAction;
 import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
+import net.dv8tion.jda.api.utils.FileUpload;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,6 +18,8 @@ import arbuzica.exchange.utilities.discord.HandlerUtility;
 public class Callback {
     private final List<ItemComponent[]> actionRows = new ArrayList<>();
     private final List<MessageEmbed> embeds = new ArrayList<>();
+    private final List<FileUpload> files = new ArrayList<>();
+    private final StringBuilder content = new StringBuilder();
     private final IHandler handler;
 
     private Callback(IHandler handler) {
@@ -34,8 +37,18 @@ public class Callback {
     }
 
     @SuppressWarnings("UnusedReturnValue")
-    public Callback addActionRow(ItemComponent... itemComponents) {
-        this.actionRows.add(itemComponents);
+    public Callback addActionRow(ItemComponent... components) {
+        this.actionRows.add(components);
+        return this;
+    }
+
+    public Callback addFile(FileUpload file) {
+        this.files.add(file);
+        return this;
+    }
+
+    public Callback addContent(String content) {
+        this.content.append(content);
         return this;
     }
 
@@ -43,19 +56,17 @@ public class Callback {
         if (HandlerUtility.isAcknowledged(handler)) {
             WebhookMessageCreateAction<Message> messageCreateAction = HandlerUtility.getHook(handler).sendMessageEmbeds(embeds);
 
-            for (ItemComponent[] actionRow : this.actionRows) {
-                messageCreateAction.addActionRow(actionRow);
-            }
+            this.actionRows.forEach(messageCreateAction::addActionRow);
+            this.files.forEach(messageCreateAction::addFiles);
 
-            messageCreateAction.queue();
+            messageCreateAction.setContent(this.content.toString()).queue();
         } else {
             ReplyCallbackAction callbackAction = HandlerUtility.getCallback(handler).addEmbeds(embeds);
 
-            for (ItemComponent[] actionRow : this.actionRows) {
-                callbackAction.addActionRow(actionRow);
-            }
+            this.actionRows.forEach(callbackAction::addActionRow);
+            this.files.forEach(callbackAction::addFiles);
 
-            callbackAction.queue();
+            callbackAction.setContent(this.content.toString()).queue();
         }
     }
 

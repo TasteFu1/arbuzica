@@ -22,8 +22,9 @@ public class ButtonHandler implements IHandler {
             return;
         }
 
+        this.event = eventIn;
+
         for (Command command : Instance.get().getCommandHandler().getCommandList()) {
-            this.event = eventIn;
             command.execute(this);
         }
     }

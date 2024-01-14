@@ -14,6 +14,7 @@ import java.util.stream.IntStream;
 
 public class StringUtility {
     private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTVWXYZ0123456789";
+    private static final String NO_DIGITS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTVWXYZ";
     private static final String DIGITS = "0123456789";
 
     public static String random(int length) {
@@ -24,15 +25,19 @@ public class StringUtility {
         return IntStream.range(0, length).mapToObj(i -> String.valueOf(DIGITS.toCharArray()[ThreadLocalRandom.current().nextInt(0, DIGITS.length())])).collect(Collectors.joining());
     }
 
+    public static String randomNoDigit(int length) {
+        return IntStream.range(0, length).mapToObj(i -> String.valueOf(NO_DIGITS.toCharArray()[ThreadLocalRandom.current().nextInt(0, NO_DIGITS.length())])).collect(Collectors.joining());
+    }
+
     public static String randomCode(int sets) {
         StringBuilder stringBuilder = new StringBuilder();
 
         for (int i = 0; i < sets; i++) {
-            stringBuilder.append(random(5).toUpperCase());
+            stringBuilder.append(random(5));
             stringBuilder.append("-");
         }
 
-        return stringBuilder.substring(0, stringBuilder.length() - 1);
+        return stringBuilder.substring(0, stringBuilder.length() - 1).toUpperCase();
     }
 
     public static boolean invalidUrl(String string) {

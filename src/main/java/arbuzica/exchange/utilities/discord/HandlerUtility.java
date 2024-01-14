@@ -42,10 +42,6 @@ public class HandlerUtility {
         return null;
     }
 
-    public static String getDiscordId(IHandler iHandler) {
-        return getUser(iHandler).getId();
-    }
-
     public static ReplyCallbackAction getCallback(IHandler iHandler) {
         if (iHandler instanceof SlashCommandHandler handler) {
             return handler.getEvent().deferReply();
@@ -86,9 +82,5 @@ public class HandlerUtility {
         }
 
         return false;
-    }
-
-    public static Account getAccount(IHandler handler) {
-        return Instance.get().getAccountRepository().findByDiscordId(getDiscordId(handler));
     }
 }
