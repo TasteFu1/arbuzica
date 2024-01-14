@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
@@ -21,6 +22,11 @@ import arbuzica.exchange.discord.override.Callback;
 import arbuzica.exchange.utilities.LitecoinUtility;
 import arbuzica.exchange.utilities.discord.HandlerUtility;
 import arbuzica.exchange.utilities.java.StringUtility;
+import net.dv8tion.jda.api.utils.messages.MessageEditData;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class ExchangeCommand extends Command {
     /*** constructor
@@ -80,7 +86,19 @@ public class ExchangeCommand extends Command {
                 .addField("Transaction ID", String.format("[%s](https://blockchair.com/litecoin/transaction/%s)", transaction.getTransactionId(), transaction.getTransactionId()), false) //
                 .build());
 
-        callback.queue();
+        Message message = callback.complete();
+
+        ScheduledExecutorService scheduledThreadPoolExecutor = Executors.newSingleThreadScheduledExecutor();
+
+        scheduledThreadPoolExecutor.scheduleAtFixedRate(() -> {
+            JsonObject verbose = JsonParser.parseString(litecoin.getTransaction(transaction.getTransactionId())).getAsJsonObject();
+            int confirmations = verbose.get("result").getAsJsonObject().get("confirmations").getAsInt(); // кол-во подтверждений у транзакции
+
+            if(confirmations > 0){
+                // message ... обновить кол-во подтверждений в сообщении
+                scheduledThreadPoolExecutor.shutdown(); // перестать смотреть за транзакцией
+            }
+        }, 0, 10, TimeUnit.SECONDS); // смотреть за транзакцией каждые 10 секунд
     }
 
     @Override

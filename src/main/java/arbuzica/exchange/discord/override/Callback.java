@@ -2,7 +2,6 @@ package arbuzica.exchange.discord.override;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageCreateAction;
 import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
@@ -70,13 +69,13 @@ public class Callback {
         }
     }
 
-    public void complete() {
+    public Message complete() {
         WebhookMessageCreateAction<Message> messageCreateAction = HandlerUtility.getHook(handler).sendMessageEmbeds(embeds);
 
         for (ItemComponent[] actionRow : this.actionRows) {
             messageCreateAction.addActionRow(actionRow);
         }
 
-        messageCreateAction.complete();
+        return messageCreateAction.complete();
     }
 }
